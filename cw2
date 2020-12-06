@@ -163,7 +163,7 @@ def show_avid():
     show_bar_plot(get_top10_readers(), 'Most avid readers','Readers','Time read')
 
 def show_also_like_graph():
-    dot = graphviz.Diraph('dot')
+    dot = graphviz.Digraph('dot')
     
     df_read = g_df_global[g_df_global.event_type == 'read']
     sr_readers = get_readers_uuids(df_read, g_doc_uuid)
@@ -191,7 +191,6 @@ def show_also_like_graph():
                 set_docs.add(doc)
 
     dot.edges(set_edges)
-    print(dot.source)
     dot.view()
         
 def get_small_uuid(uuid):
