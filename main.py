@@ -10,6 +10,9 @@ g_df_global = g_df_document = g_df_continent = None
 g_usr_uuid = g_doc_uuid = ''
 
 def main(argv):
+    global g_usr_uuid, g_doc_uuid 
+    global g_df_global, g_df_document, g_df_continent
+
     g_usr_uuid, g_doc_uuid, file_name, task_id = check_input(argv)
     g_df_global, g_df_document, g_df_continent = init_dfs(file_name)
 
@@ -89,6 +92,8 @@ def get_browsers():
     return g_df_global.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
 
 def get_browsers_clean():
+    global g_df_global
+    
     refined_useragent = g_df_global.visitor_useragent.str.extract(r'(\w+)/.*$')
     g_df_global = g_df_global.assign(visitor_useragent=refined_useragent)
     
@@ -143,30 +148,35 @@ def show_bar_plot(df, title, x, y):
         show_popup('Nothing found', 'No data was found for these criterias')
 
 def show_countries():
-    show_bar_plot(get_countries(g_df_document),'Number of visitors per country', 'Countries','Visitors')
+    show_bar_plot(get_countries(),'Number of visitors per country', 'Countries','Visitors')
 
 def show_continents():
-    show_bar_plot(get_continents(g_df_document, g_df_continent), 'Number of visitors per continent', 'Continents', 'Visitors')
+    show_bar_plot(get_continents(), 'Number of visitors per continent', 'Continents', 'Visitors')
 
 def show_browsers():
-    show_bar_plot(get_browsers(g_df_global),'Number of visitors per browser', 'Browsers','Visitors')
+    show_bar_plot(get_browsers(),'Number of visitors per browser', 'Browsers','Visitors')
 
 def show_browsers_clean():
-    show_bar_plot(get_browsers_clean(g_df_global),'Number of visitors per browser', 'Browsers','Visitors')
+    show_bar_plot(get_browsers_clean(),'Number of visitors per browser', 'Browsers','Visitors')
 
 def show_avid():
-    show_bar_plot(get_top10_readers(g_df_global), 'Most avid readers','Readers','Time read')
+    show_bar_plot(get_top10_readers(), 'Most avid readers','Readers','Time read')
 
 def show_also_like_list():
     list_also_like = also_like(sort_df_desc)
     also_like_text = 'Similar documents are :\n' + ',\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
     show_popup('Also like ' + g_doc_uuid, also_like_text)
 
-def also_like_buttons():
+def also_like_buttons(new_doc_uuid, new_usr_uuid):
+    global g_usr_uuid, g_doc_uuid 
+    global g_df_global, g_df_document, g_df_continent
+
+    g_doc_uuid, g_usr_uuid = new_doc_uuid, new_usr_uuid
     g_df_document = g_df_global[g_df_global.subject_doc_id == g_doc_uuid]
+    
     show_also_like_list(g_df_global, g_doc_uuid, g_user_uuid)
 
-def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid): 
+def show_gui(): 
     window = tkinter.Tk()
 
     bt_countries = tkinter.Button(text="Visitors by countries", command=show_countries)
@@ -192,7 +202,7 @@ def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid):
     entry_usr.insert(0, g_usr_uuid)
     entry_usr.pack()
 
-    bt_alike_list = tkinter.Button(text="Show also like list", command=also_like_buttons
+    bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: also_like_buttons(entry_doc.get(), entry_usr.get()))
     bt_alike_list.pack()
 
     bt_exit = tkinter.Button(text="Quit", command=exit)
