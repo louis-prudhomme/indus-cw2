@@ -4,8 +4,7 @@ import json
 import pandas
 import numpy
 import matplotlib.pyplot as pyplot
-
-import tkinter as tk
+import tkinter
 
 def main(argv):
     usr_uuid, doc_uuid, file_name, task_id = check_input(argv)
@@ -148,29 +147,29 @@ def show_avid(df_global):
 
 def show_also_like(df_global, doc_uuid, user_uuid):
     list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
-    window_also_like = tk.Tk()
-    label_doc = tk.Label(text="Also like the document " + doc_uuid)
+    window_also_like = tkinter.Tk()
+    label_doc = tkinter.Label(text="Also like the document " + doc_uuid)
     label_doc.pack()
-    label_alike = tk.Label(text=list_also_like)
+    label_alike = tkinter.Label(text=list_also_like)
     label_alike.pack()
     window_also_like.mainloop()
 
 
 def show_gui(doc_uuid, usr_uuid): 
-    window = tk.Tk()
+    window = tkinter.Tk()
 
-    label_doc = tk.Label(text="User-chosen document UUID :" + doc_uuid)
+    label_doc = tkinter.Label(text="User-chosen document UUID :" + doc_uuid)
     label_doc.pack()
-    label_usr = tk.Label(text="User-chosen user UUID :" + usr_uuid)
+    label_usr = tkinter.Label(text="User-chosen user UUID :" + usr_uuid)
     label_usr.pack()
 
-    bt_countries = tk.Button(text="Visitors by countries", command=show_countries)
+    bt_countries = tkinter.Button(text="Visitors by countries", command=show_countries)
     bt_countries.pack()
 
-    bt_continents = tk.Button(text="Visitors by continents", command=show_continents)
+    bt_continents = tkinter.Button(text="Visitors by continents", command=show_continents)
     bt_continents.pack()
 
-    bt_browsers = tk.Button(text="Visitors by browsers", command=show_browsers)
+    bt_browsers = tkinter.Button(text="Visitors by browsers", command=show_browsers)
     bt_browsers.pack()
 
     window.mainloop()
