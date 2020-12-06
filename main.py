@@ -97,26 +97,26 @@ def get_browsers_clean():
     refined_useragent = g_df_global.visitor_useragent.str.extract(r'(\w+)/.*$')
     g_df_global = g_df_global.assign(visitor_useragent=refined_useragent)
     
-    return df_global.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
+    return g_df_global.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
 
 def get_top10_readers():
     df_pageandread = g_df_global[g_df_global.event_type == 'pagereadtime'][['visitor_uuid', 'event_readtime']]
     return pandas.DataFrame(df_pageandread.groupby(['visitor_uuid']).sum().sort_values('event_readtime').head(10))
 
 def get_readers_uuids(df_read, document_uuid):
-    return pandas.Series(g_df_global[df_global.subject_doc_id == document_uuid].visitor_uuid.unique())
+    return pandas.Series(g_df_global[g_df_global.subject_doc_id == document_uuid].visitor_uuid.unique())
 
 def get_docs_read(visitor_uuid):
     return pandas.Series(g_df_global[g_df_global.visitor_uuid == visitor_uuid].subject_doc_id)
 
 def get_alike(sort_func=lambda df: df):
     df_read = g_df_global[g_df_global.event_type == 'read']
-    sr_readers = get_readers_uuids(df_read, doc_uuid)
-    sr_readers = sr_readers[sr_readers != g_user_uuid]
+    sr_readers = get_readers_uuids(df_read, g_doc_uuid)
+    sr_readers = sr_readers[sr_readers != g_usr_uuid]
 
     list_series = []
     for usr in sr_readers:
-        list_series.append(get_docs_read(g_df_global, usr))
+        list_series.append(get_docs_read(usr))
     
     if len(list_series) < 1:
         return pandas.Series([])
@@ -167,28 +167,28 @@ def show_also_like_list():
     also_like_text = 'Similar documents are :\n' + ',\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
     show_popup('Also like ' + g_doc_uuid, also_like_text)
 
-def also_like_buttons(new_doc_uuid, new_usr_uuid):
+def update_inputs(new_doc_uuid, new_usr_uuid, next_action):
     global g_usr_uuid, g_doc_uuid 
     global g_df_global, g_df_document, g_df_continent
 
     g_doc_uuid, g_usr_uuid = new_doc_uuid, new_usr_uuid
     g_df_document = g_df_global[g_df_global.subject_doc_id == g_doc_uuid]
     
-    show_also_like_list(g_df_global, g_doc_uuid, g_user_uuid)
+    next_action()
 
 def show_gui(): 
     window = tkinter.Tk()
 
-    bt_countries = tkinter.Button(text="Visitors by countries", command=show_countries)
+    bt_countries = tkinter.Button(text="Visitors by countries", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_countries))
     bt_countries.pack()
 
-    bt_continents = tkinter.Button(text="Visitors by continents", command=show_continents)
+    bt_continents = tkinter.Button(text="Visitors by continents", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_continents))
     bt_continents.pack()
 
-    bt_browsers = tkinter.Button(text="Visitors by browsers", command=show_browsers_clean)
+    bt_browsers = tkinter.Button(text="Visitors by browsers", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_browsers_clean))
     bt_browsers.pack()
 
-    bt_avid = tkinter.Button(text="Most avid readers", command=show_avid)
+    bt_avid = tkinter.Button(text="Most avid readers", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_avid))
     bt_avid.pack()
 
     entry_doc = tkinter.Entry(window)
@@ -202,7 +202,7 @@ def show_gui():
     entry_usr.insert(0, g_usr_uuid)
     entry_usr.pack()
 
-    bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: also_like_buttons(entry_doc.get(), entry_usr.get()))
+    bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_also_like_list))
     bt_alike_list.pack()
 
     bt_exit = tkinter.Button(text="Quit", command=exit)
