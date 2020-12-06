@@ -160,6 +160,10 @@ def show_also_like_list(df_global, doc_uuid, user_uuid):
     also_like_text = 'Similar documents are :\n' + ',\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
     show_popup('Also like ' + doc_uuid, also_like_text)
 
+def also_like_buttons(df_global, df_document, doc_uuid, user_uuid):
+    df_document = df_global[df_global.subject_doc_id == doc_uuid]
+    show_also_like_list(df_global, doc_uuid, user_uuid)
+
 def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid): 
     window = tkinter.Tk()
 
@@ -191,7 +195,7 @@ def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid):
     entry_usr.insert(0, usr_uuid)
     entry_usr.pack()
 
-    bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: show_also_like_list(df_global, entry_doc.get(), entry_usr.get()))
+    bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: also_like_buttons(df_global, df_document, entry_doc.get(), entry_usr.get()))
     bt_alike_list.pack()
 
     bt_exit = tkinter.Button(text="Quit", command=exit)
