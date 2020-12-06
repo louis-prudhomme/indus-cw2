@@ -78,18 +78,16 @@ def show_avid():
     make_plot(get_top10_readers(df_global.copy()), 'Most avid readers','Readers','Time read')
 
 window = tk.Tk()
-frame = tk.Frame(window)
-frame.pack()
 
-label_doc = tk.Label(frame=frame, text="User-chosen document UUID :" + uuid)
+label_doc = tk.Label(text="User-chosen document UUID :" + uuid)
 label_doc.pack()
-label_usr = tk.Label(frame=frame, text="User-chosen user UUID :" + uuid)
+label_usr = tk.Label(text="User-chosen user UUID :" + uuid)
 label_usr.pack()
 
-bt_countries = tk.Button(frame=frame, text="Visitors by countries", command=show_countries)
+bt_countries = tk.Button(text="Visitors by countries", command=show_countries)
 bt_countries.pack()
 
-bt_continents = tk.Button(frame=frame, text="Visitors by countries", command=show_continents)
+bt_continents = tk.Button(text="Visitors by countries", command=show_continents)
 bt_continents.pack()
 
 window.mainloop()
