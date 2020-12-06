@@ -163,7 +163,7 @@ def show_avid():
     show_bar_plot(get_top10_readers(), 'Most avid readers','Readers','Time read')
 
 def show_also_like_graph():
-    dot = graphviz.Graph('dot')
+    dot = graphviz.Diraph('dot')
     
     df_read = g_df_global[g_df_global.event_type == 'read']
     sr_readers = get_readers_uuids(df_read, g_doc_uuid)
@@ -174,13 +174,13 @@ def show_also_like_graph():
     set_docs.add(g_doc_uuid)
     dot.attr('node', shape='circle', fillcolor='springgreen2', style='filled')
     dot.node(g_doc_uuid, get_small_uuid(g_doc_uuid))
-    dot.attr('node', shape='box', fillcolor='springgreen2', style='filled')
+    dot.attr('node', shape='box')
     dot.node(g_usr_uuid, get_small_uuid(g_usr_uuid))
     set_edges.add((g_usr_uuid, g_doc_uuid))
 
     for reader in sr_readers[sr_readers != g_usr_uuid]:
         reads = get_docs_read(df_read, reader)
-        dot.attr('node', shape='box')
+        dot.attr('node', shape='box', fillcolor='white')
         dot.node(reader, get_small_uuid(reader))
         set_edges.add((reader, g_doc_uuid))
         for doc in reads:
@@ -192,7 +192,7 @@ def show_also_like_graph():
 
     dot.edges(set_edges)
     print(dot.source)
-    dot.render()
+    dot.view()
         
 def get_small_uuid(uuid):
     return uuid[-4:]
