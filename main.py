@@ -65,10 +65,17 @@ def make_plot(df, title, label_x, label_y):
     pyplot.ylabel(label_y)
     pyplot.show()
 
-#make_plot(get_continents(df_document, df_continents), 'Number of visitors per continent', 'Continents', 'Visitors')
-#make_plot(get_countries(df_document.copy()),'Number of visitors per country', 'Countries','Visitors')
-#make_plot(get_browsers(df_global.copy()),'Number of visitors per browser', 'Browsers','Visitors')
-#make_plot(get_top10_readers(df_global.copy()), 'Most avid readers','Readers','Time read')
+def show_continents():
+    make_plot(get_continents(df_document, df_continents), 'Number of visitors per continent', 'Continents', 'Visitors')
+    
+def show_countries():
+    make_plot(get_countries(df_document.copy()),'Number of visitors per country', 'Countries','Visitors')
+
+def show_browsers():
+    make_plot(get_browsers(df_global.copy()),'Number of visitors per browser', 'Browsers','Visitors')
+
+def show_avid():
+    make_plot(get_top10_readers(df_global.copy()), 'Most avid readers','Readers','Time read')
 
 window = tk.Tk()
 frame = tk.Frame(window)
@@ -79,10 +86,10 @@ label_doc.pack()
 label_usr = tk.Label(frame=frame, text="User-chosen user UUID :" + uuid)
 label_usr.pack()
 
-bt_countries = tk.Button(frame=frame, text="Visitors by countries", command=make_plot(get_countries(df_document.copy()),'Number of visitors per country', 'Countries','Visitors'))
+bt_countries = tk.Button(frame=frame, text="Visitors by countries", command=show_countries)
 bt_countries.pack()
 
-bt_continents = tk.Button(frame=frame, text="Visitors by countries", command=make_plot(get_continents(df_document, df_continents), 'Number of visitors per continent', 'Continents', 'Visitors'))
+bt_continents = tk.Button(frame=frame, text="Visitors by countries", command=show_continents)
 bt_continents.pack()
 
 window.mainloop()
