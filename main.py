@@ -8,13 +8,16 @@ import matplotlib.pyplot as pyplot
 uuid = sys.argv[1]
 
 df_global = pandas.read_json(open('./issuu_cw2.json'), lines=True)
+df_continents = pandas.read_json(open('./continent.json'), typ='series').rename_axis('country_code').reset_index(name='continent_code')
+print(df_continents)
+
 df_document = df_global[df_global.subject_doc_id == uuid]
 
 def get_countries(df_document):
     return df_document.visitor_country.value_counts().rename_axis('visitor_country').reset_index(name='number_visitors')
 
-def get_continents(df_countries):
-    return 0
+def get_continents(df_document, df_continents):
+    return pandas.merge(left=df_document, right=df_continents,  left_on='visitor_country', right_on='country_code')
 
 def get_browsers(df_global):
     refined_useragent = df_global.visitor_useragent.str.extract(r'(\w+)/.*$')
@@ -64,3 +67,5 @@ def make_plot(df, title, label_x, label_y):
 make_plot(get_countries(df_document.copy()),'Number of visitors per country', 'Countries','Visitors')
 make_plot(get_browsers(df_global.copy()),'Number of visitors per browser', 'Browsers','Visitors')
 make_plot(get_top10_readers(df_global.copy()), 'Most avid readers','Readers','Time read')
+make_plot(get_continents(df_document, df_continents), 'Number of visitors per continent', 'Continents', 'Visitors')
+print(get_continents(df_document, df_continents))
