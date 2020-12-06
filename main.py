@@ -31,7 +31,7 @@ def get_readers_uuids(df_global, doc_uuid):
 def get_docs_read(df_global, visitor_uuid):
     return pandas.Series(df_global[df_global.visitor_uuid == visitor_uuid].subject_doc_id)
 
-def get_alike(df_global, doc_uuid, user_uuid=0):
+def get_alike(df_global, doc_uuid, user_uuid=0, sort_func=lambda entry: entry):
     df_read = df_global[df_global.event_type == 'read']
     sr_readers = get_readers_uuids(df_global, doc_uuid)
     sr_readers = sr_readers[sr_readers != user_uuid]
@@ -42,7 +42,9 @@ def get_alike(df_global, doc_uuid, user_uuid=0):
 
     sr_alike = pandas.concat(list_series)
     sr_alike.dropna(inplace=True)
-    return sr_alike[sr_alike != doc_uuid]
+    return sr_alike[sr_alike != doc_uuid].value_counts()
 
-print(get_alike(df_global, uuid))
-print(get_alike(df_global, uuid).value_counts())
+def also_like(df_global, doc_uuid, user_uuid=0, sort_func=lambda entry: entry):
+    return get_alike(df_global, doc_uuid, user_uuid, sort_func).head(10)
+
+print(also_like(df_global, uuid))
