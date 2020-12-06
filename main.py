@@ -13,9 +13,11 @@ def main(argv):
     if task_id == '2a':
         show_countries(df_document)
     elif task_id == '2b':
-        show_continents(df_document)
-    elif task_id == '3b':
+        show_continents(df_document, df_continent)
+    elif task_id == '3a':
         show_browsers(df_global)
+    elif task_id == '3b':
+        show_browsers_clean(df_global)
     elif task_id == '4':
         show_avid(df_global)
     elif task_id == '5d':
@@ -79,10 +81,14 @@ def help(err_code=0, err_msg='The correct usage is :'):
 def get_countries(df_document):
     return df_document.visitor_country.value_counts().rename_axis('visitor_country').reset_index(name='number_visitors').set_index('visitor_country')
 
-def get_continents(df_document, df_continents):
-    return pandas.merge(left=df_document, right=df_continents,  left_on='visitor_country', right_on='country_code').continent_code.value_counts().rename_axis('visitor_continent').reset_index(name='number_visitors').set_index('visitor_continent')
+def get_continents(df_document, df_continent):
+    return pandas.merge(left=df_document, right=df_continent,  left_on='visitor_country', right_on='country_code').continent_code.value_counts().rename_axis('visitor_continent').reset_index(name='number_visitors').set_index('visitor_continent')
 
-def get_browsers(df_global):
+def get_browsers(df_global):    
+    return df_global.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
+
+
+def get_browsers_clean(df_global):
     refined_useragent = df_global.visitor_useragent.str.extract(r'(\w+)/.*$')
     df_global = df_global.assign(visitor_useragent=refined_useragent)
     
@@ -141,6 +147,9 @@ def show_continents(df_document, df_continent):
 
 def show_browsers(df_global):
     show_bar_plot(get_browsers(df_global),'Number of visitors per browser', 'Browsers','Visitors')
+
+def show_browsers_clean(df_global):
+    show_bar_plot(get_browsers_clean(df_global),'Number of visitors per browser', 'Browsers','Visitors')
 
 def show_avid(df_global):
     show_bar_plot(get_top10_readers(df_global), 'Most avid readers','Readers','Time read')
