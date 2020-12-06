@@ -31,7 +31,7 @@ def get_readers_uuids(df_global, doc_uuid):
 def get_docs_read(df_global, visitor_uuid):
     return pandas.Series(df_global[df_global.visitor_uuid == visitor_uuid].subject_doc_id)
 
-def get_alike(df_global, doc_uuid, user_uuid=0, sort_func=lambda entry: entry):
+def get_alike(df_global, doc_uuid, user_uuid=0, sort_func=lambda df: df):
     df_read = df_global[df_global.event_type == 'read']
     sr_readers = get_readers_uuids(df_read, doc_uuid)
     sr_readers = sr_readers[sr_readers != user_uuid]
@@ -44,7 +44,37 @@ def get_alike(df_global, doc_uuid, user_uuid=0, sort_func=lambda entry: entry):
     sr_alike.dropna(inplace=True)
     return sr_alike[sr_alike != doc_uuid].value_counts()
 
-def also_like(df_global, doc_uuid, user_uuid=0, sort_func=lambda entry: entry):
-    return get_alike(df_global, doc_uuid, user_uuid, sort_func).head(10)
+def sort_df_asc(df_alike):
+    return df_alike.sort_values(ascending=True)
 
-print(also_like(df_global, uuid))
+def sort_df_desc(df_alike):
+    return df_alike.sort_values(ascending=False)
+
+def also_like(df_global, doc_uuid, user_uuid=0, sort_func=lambda df: df):
+    return sort_func(get_alike(df_global, doc_uuid, user_uuid, sort_func).head(10))
+
+
+print(also_like(df_global, uuid, '2f63e0cca690da91', sort_func=sort_df_desc))
+
+fig, axes = pyplot.subplots(nrows=2, ncols=2)
+ax0, ax1, ax2, ax3 = axes.flatten()
+
+ax0.hist(get_countries(df_document))
+ax0.set_title("Number of visitors by country")
+ax0.set_xlabel("Country")
+ax0.set_ylabel("Number of visitors")
+
+ax1.hist(get_countries(df_document))
+ax1.set_title("Number of visitors by continent")
+ax1.set_xlabel("Continent")
+ax1.set_ylabel("Number of visitors")
+
+ax2.hist(get_browsers(df_global))
+ax2.set_title("Number of visitors by brower")
+ax2.set_xlabel("Browser")
+ax2.set_ylabel("Number of visitors")
+
+ax3.hist(get_top10_readers(df_global))
+ax3.set_title("Most avid readers")
+ax3.set_xlabel("Reader")
+ax3.set_ylabel("Number of reads")
