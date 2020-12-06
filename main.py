@@ -112,13 +112,13 @@ def get_alike(df_global, doc_uuid, user_uuid=0, sort_func=lambda df: df):
     list_series = []
     for usr in sr_readers:
         list_series.append(get_docs_read(df_global, usr))
-
+    
     if len(list_series) < 1:
-        show_popup('Nothing found', 'No data was found for these criterias')
-    else:
-        sr_alike = pandas.concat(list_series)
-        sr_alike.dropna(inplace=True)
-        return sr_alike[sr_alike != doc_uuid].value_counts()
+        return pandas.Series([])
+
+    sr_alike = pandas.concat(list_series)
+    sr_alike.dropna(inplace=True)
+    return sr_alike[sr_alike != doc_uuid].value_counts() 
 
 def sort_df_asc(df_alike):
     return df_alike.sort_values(ascending=True)
@@ -158,11 +158,16 @@ def show_avid(df_global):
     show_bar_plot(get_top10_readers(df_global), 'Most avid readers','Readers','Time read')
 
 def show_also_like(df_global, doc_uuid, user_uuid):
-    list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
     window_also_like = tkinter.Tk()
     label_doc = tkinter.Label(text="Also like the document " + doc_uuid)
     label_doc.pack()
-    label_alike = tkinter.Label(text=list_also_like)
+
+    list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
+    if len(list_also_like) > 0:
+        label_alike = tkinter.Label(text='No similar doc were found')
+    else:
+        label_alike = tkinter.Label(text=list_also_like)
+
     label_alike.pack()
     window_also_like.mainloop()
 
