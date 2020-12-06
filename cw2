@@ -164,8 +164,6 @@ def show_avid():
 def show_also_like_list():
     list_also_like = also_like(sort_df_desc)
     also_like_text = 'Similar documents are :\n' + ',\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
-    print(also_like_text)
-    exit()
 
     show_popup('Also like ' + g_doc_uuid, also_like_text)
 
