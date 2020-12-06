@@ -174,9 +174,10 @@ def show_also_like_graph():
     set_docs.add(g_doc_uuid)
     dot.attr('node', shape='circle', fillcolor='springgreen2', style='filled')
     dot.node(g_doc_uuid, get_small_uuid(g_doc_uuid))
-    dot.attr('node', shape='box')
-    dot.node(g_usr_uuid, get_small_uuid(g_usr_uuid))
-    set_edges.add((g_usr_uuid, g_doc_uuid))
+    if g_usr_uuid:
+        dot.attr('node', shape='box')
+        dot.node(g_usr_uuid, get_small_uuid(g_usr_uuid))
+        set_edges.add((g_usr_uuid, g_doc_uuid))
 
     for reader in sr_readers[sr_readers != g_usr_uuid]:
         reads = get_docs_read(df_read, reader)
