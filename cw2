@@ -7,15 +7,27 @@ import matplotlib.pyplot as pyplot
 import tkinter
 import graphviz
 
+# global vars representing useful dataframes
+# g_df_global represents the base dataset
+# g_df_global represents the dataset for the selected document
+# g_df_global represents the continent dataset
 g_df_global = g_df_document = g_df_continent = None
+# global vars representing useful vars
+# g_usr_uuid represents the currently select usr uuid
+# g_doc_uuid represents the currently select doc uuid
 g_usr_uuid = g_doc_uuid = ''
 
+# entry point of the program 
 def main(argv):
     global g_usr_uuid, g_doc_uuid 
     global g_df_global, g_df_document, g_df_continent
-
+    
+    # fetching command-line parameters
     g_usr_uuid, g_doc_uuid, file_name, task_id = check_input(argv)
+    # fetching and building datasets
     g_df_global, g_df_document, g_df_continent = init_dfs(file_name)
+
+    # dispatching according to the specified task
     if task_id == '2a':
         show_countries()
     elif task_id == '2b':
@@ -33,9 +45,7 @@ def main(argv):
     elif task_id == '7':
         show_gui()
 
-def show_popup(title, msg):
-    tkinter.messagebox.showinfo(title, msg)
-
+# checks and sanitize the input
 def check_input(argv):
     usr_uuid = doc_uuid = file_name = task_id = ''
     valid_task_ids = ['2a', '2b', '3a', '3b', '4', '5d', '6', '7']
@@ -56,6 +66,7 @@ def check_input(argv):
             help(0)
         else:
             help(2)
+    # all arguments except usr_uuid mandatory
     if doc_uuid == '' or file_name == '' or task_id == '':
         help(2)
     elif task_id not in valid_task_ids:
@@ -63,6 +74,7 @@ def check_input(argv):
     else:
         return usr_uuid, doc_uuid, file_name, task_id
 
+# fetches and builds the global dataframes
 def init_dfs(file_name):
     try: 
         print('Obtaining dataset, please wait')
@@ -77,20 +89,19 @@ def init_dfs(file_name):
         df_document = df_global[df_global.subject_doc_id == g_doc_uuid]
         return df_global, df_document, df_continent
 
-def help(err_code=0, err_msg='The correct usage is : cw2 -u user_uuid -d doc_uuid -t task_id -f file_name'):
-    print('CW2 Help')
-    print(err_msg)
-    exit(err_code)
-
+# returns a dataframe with all the countries having read the document
 def get_countries():
     return g_df_document.visitor_country.value_counts().rename_axis('visitor_country').reset_index(name='number_visitors').set_index('visitor_country')
 
+# returns a dataframe with all the continents having read the document
 def get_continents():
     return pandas.merge(left=g_df_document, right=g_df_continent,  left_on='visitor_country', right_on='country_code').continent_code.value_counts().rename_axis('visitor_continent').reset_index(name='number_visitors').set_index('visitor_continent')
 
+# returns a dataframe with all the browsers accessing the service
 def get_browsers():    
     return g_df_global.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
 
+# returns a dataframe with all the browser accessing the service, specifying the browser only (instead of user agent)
 def get_browsers_clean():
     global g_df_global
     
@@ -99,21 +110,30 @@ def get_browsers_clean():
     
     return g_df_global.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
 
+# returns a dataframe containing the top ten biggest readers by summing their pagereadtime
 def get_top10_readers():
     df_pageandread = g_df_global[g_df_global.event_type == 'pagereadtime'][['visitor_uuid', 'event_readtime']]
     return pandas.DataFrame(df_pageandread.groupby(['visitor_uuid']).sum().sort_values('event_readtime').head(10))
 
+# returns the uuid for every reader of the provided document
 def get_readers_uuids(df_read, document_uuid):
     return pandas.Series(df_read[df_read.subject_doc_id == document_uuid].visitor_uuid.unique())
 
+# returns the list of every document read by the specified visitor
 def get_docs_read(df_read, visitor_uuid):
     return pandas.Series(df_read[df_read.visitor_uuid == visitor_uuid].subject_doc_id)
 
+# returns a serie of every document similar to the currently select (g_doc_uuid) 
+# similar documents are those who have been read by readers of the reference one
 def get_alike(sort_func=lambda df: df):
+    # selecting only read events
     df_read = g_df_global[g_df_global.event_type == 'read']
+    # selecting the readers for the reference document
     sr_readers = get_readers_uuids(df_read, g_doc_uuid)
+    # skimming currently selected user
     sr_readers = sr_readers[sr_readers != g_usr_uuid]
 
+    # flattening to obtain a list of every document read by the readers
     list_series = []
     for usr in sr_readers:
         list_series.append(get_docs_read(df_read, usr))
@@ -121,19 +141,24 @@ def get_alike(sort_func=lambda df: df):
     if len(list_series) < 1:
         return pandas.Series([])
 
+    # skimming nan and the reference document
     sr_alike = pandas.concat(list_series)
     sr_alike.dropna(inplace=True)
     return sr_alike[sr_alike != g_doc_uuid].value_counts() 
 
+# sorts a dataframe ascendingly
 def sort_df_asc(df_alike):
     return df_alike.sort_values(ascending=True)
 
+# sorts a dataframe descendingly
 def sort_df_desc(df_alike):
     return df_alike.sort_values(ascending=False)
 
+# returns the ten first similar documents, sorted with the provided function
 def also_like(sort_func=lambda df: df):
     return sort_func(get_alike(sort_func).head(10)).index.tolist()
 
+# makes a plot with the provided dataframe and legends
 def make_plot(df, title, label_x, label_y):
     df.plot(kind='bar', rot=0)
     pyplot.suptitle(title)
@@ -141,69 +166,94 @@ def make_plot(df, title, label_x, label_y):
     pyplot.ylabel(label_y)
     pyplot.show()
     
+# sanitizes and show a plot with the provided dataframe and legends
 def show_bar_plot(df, title, x, y):
     if df.shape[0] > 0:
         make_plot(df, title, x, y)
     else:
         show_popup('Nothing found', 'No data was found for these criterias')
 
+# shows a plot of the countries from which readers access the currently selected document
 def show_countries():
     show_bar_plot(get_countries(),'Number of visitors per country', 'Countries','Visitors')
 
+# shows a plot of the continents from which readers access the currently selected document
 def show_continents():
     show_bar_plot(get_continents(), 'Number of visitors per continent', 'Continents', 'Visitors')
 
+# shows a plot of the useragents from which readers access the service
 def show_browsers():
     show_bar_plot(get_browsers(),'Number of visitors per browser', 'Browsers','Visitors')
 
+# shows a plot of the browsers from which readers access the serviceselected document
 def show_browsers_clean():
     show_bar_plot(get_browsers_clean(),'Number of visitors per browser', 'Browsers','Visitors')
 
+# shows a plot with the ten most avid readers of the website
 def show_avid():
     show_bar_plot(get_top10_readers(), 'Most avid readers','Readers','Time read')
 
+# shows a graph of documents similar to the currently selected one
 def show_also_like_graph():
+    # graph init
     dot = graphviz.Digraph('dot')
     
+    # selecting only read events
     df_read = g_df_global[g_df_global.event_type == 'read']
+    # obtaining the list of readers for the reference document
     sr_readers = get_readers_uuids(df_read, g_doc_uuid)
 
+    # set for documents
     set_docs = set()
+    # set for tuples of edges, ie (node, node)
     set_edges = set()
 
+    # adding the currently selected doc to the graph
     set_docs.add(g_doc_uuid)
     dot.attr('node', shape='circle', fillcolor='springgreen2', style='filled')
     dot.node(g_doc_uuid, get_small_uuid(g_doc_uuid))
+    # adding the currently selected usr to the graph (if there is one)
     if g_usr_uuid:
         dot.attr('node', shape='box')
         dot.node(g_usr_uuid, get_small_uuid(g_usr_uuid))
         set_edges.add((g_usr_uuid, g_doc_uuid))
 
+    # for every reader of the reference document
     for reader in sr_readers[sr_readers != g_usr_uuid]:
+        # fetching list of read documents for current reader
         reads = get_docs_read(df_read, reader)
+        # adding reader to graphs
         dot.attr('node', shape='box', fillcolor='white')
         dot.node(reader, get_small_uuid(reader))
+        # adding an edge with the reference document
         set_edges.add((reader, g_doc_uuid))
+        # for every doc read by the reader
         for doc in reads:
+            # adding edge with the reader
             set_edges.add((reader, doc))
+            # if the doc has not been added to the graph
             if doc not in set_docs:
+                # add doc to graph
                 dot.attr('node', shape='circle')
                 dot.node(doc, get_small_uuid(doc))
                 set_docs.add(doc)
-
+    # adding all the planned edges to the graph
     dot.edges(set_edges)
+    # visualization
     dot.view()
-        
+
+# returns a small uuid (last 4 chars)
 def get_small_uuid(uuid):
     return uuid[-4:]
 
+# shows a popup displaying a list of documents similar to the reference 
 def show_also_like_list():
     list_also_like = also_like(sort_df_desc)
     also_like_text = 'Similar documents are :\n' + ',\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
 
     show_popup('Also like ' + g_doc_uuid, also_like_text)
 
-
+# updates the global vars with the user input before anything else
 def update_inputs(new_doc_uuid, new_usr_uuid, next_action):
     global g_usr_uuid, g_doc_uuid 
     global g_df_global, g_df_document, g_df_continent
@@ -211,8 +261,10 @@ def update_inputs(new_doc_uuid, new_usr_uuid, next_action):
     g_doc_uuid, g_usr_uuid = new_doc_uuid, new_usr_uuid
     g_df_document = g_df_global[g_df_global.subject_doc_id == g_doc_uuid]
     
+    # calls the next action to perform
     next_action()
 
+# creates and displays the app’s gui
 def show_gui(): 
     window = tkinter.Tk()
 
@@ -250,6 +302,15 @@ def show_gui():
 
     window.mainloop()
 
+# shows a popup with the specified title and message
+def show_popup(title, msg):
+    tkinter.messagebox.showinfo(title, msg)
+
+# prompt help in the console
+def help(err_code=0, err_msg='The correct usage is : cw2 -u user_uuid -d doc_uuid -t task_id -f file_name'):
+    print('CW2 Help')
+    print(err_msg)
+    exit(err_code)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
