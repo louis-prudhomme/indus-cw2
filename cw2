@@ -5,6 +5,7 @@ import pandas
 import numpy
 import matplotlib.pyplot as pyplot
 import tkinter
+import graphviz
 
 g_df_global = g_df_document = g_df_continent = None
 g_usr_uuid = g_doc_uuid = ''
@@ -28,7 +29,7 @@ def main(argv):
     elif task_id == '5d':
         show_also_like_list()
     elif task_id == '6':
-        return
+        show_also_like_graph()
     elif task_id == '7':
         show_gui()
 
@@ -161,11 +162,47 @@ def show_browsers_clean():
 def show_avid():
     show_bar_plot(get_top10_readers(), 'Most avid readers','Readers','Time read')
 
+def show_also_like_graph():
+    dot = graphviz.Graph('dot')
+    
+    df_read = g_df_global[g_df_global.event_type == 'read']
+    sr_readers = get_readers_uuids(df_read, g_doc_uuid)
+
+    set_docs = set()
+    set_edges = set()
+
+    set_docs.add(g_doc_uuid)
+    dot.attr('node', shape='circle', fillcolor='springgreen2', style='filled')
+    dot.node(g_doc_uuid, get_small_uuid(g_doc_uuid))
+    dot.attr('node', shape='box', fillcolor='springgreen2', style='filled')
+    dot.node(g_usr_uuid, get_small_uuid(g_usr_uuid))
+    set_edges.add((g_usr_uuid, g_doc_uuid))
+
+    for reader in sr_readers[sr_readers != g_usr_uuid]:
+        reads = get_docs_read(df_read, reader)
+        dot.attr('node', shape='box')
+        dot.node(reader, get_small_uuid(reader))
+        set_edges.add((reader, g_doc_uuid))
+        for doc in reads:
+            set_edges.add((reader, doc))
+            if doc not in set_docs:
+                dot.attr('node', shape='circle')
+                dot.node(doc, get_small_uuid(doc))
+                set_docs.add(doc)
+
+    dot.edges(set_edges)
+    print(dot.source)
+    dot.render()
+        
+def get_small_uuid(uuid):
+    return uuid[-4:]
+
 def show_also_like_list():
     list_also_like = also_like(sort_df_desc)
     also_like_text = 'Similar documents are :\n' + ',\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
 
     show_popup('Also like ' + g_doc_uuid, also_like_text)
+
 
 def update_inputs(new_doc_uuid, new_usr_uuid, next_action):
     global g_usr_uuid, g_doc_uuid 

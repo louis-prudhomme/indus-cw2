@@ -1,0 +1,25 @@
+graph dot {
+	node [fillcolor=springgreen2 shape=circle style=filled]
+	"140228202800-6ef39a241f35301a9a42cd0ed21e5fb0" [label="5fb0"]
+	node [fillcolor=springgreen2 shape=box style=filled]
+	"04daa9ed9dde73d3" [label="73d3"]
+	node [shape=box]
+	"2f63e0cca690da91" [label=da91]
+	node [shape=circle]
+	"140204115519-f5fa6ce8b288c9f10e0c8bc7e1a456a0" [label="56a0"]
+	node [shape=circle]
+	"140219141540-c900b41f845c67cc08b58911155c681c" [label="681c"]
+	node [shape=box]
+	b2a24f14bb5c9ea3 [label="9ea3"]
+	node [shape=box]
+	"6229cca3564cb1d1" [label=b1d1]
+	node [shape=box]
+	"355361a351094143" [label=4143]
+	"04daa9ed9dde73d3" -- "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"
+	b2a24f14bb5c9ea3 -- "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"
+	"355361a351094143" -- "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"
+	"6229cca3564cb1d1" -- "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"
+	"2f63e0cca690da91" -- "140204115519-f5fa6ce8b288c9f10e0c8bc7e1a456a0"
+	"2f63e0cca690da91" -- "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"
+	"2f63e0cca690da91" -- "140219141540-c900b41f845c67cc08b58911155c681c"
+}
