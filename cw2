@@ -242,6 +242,9 @@ def show_gui():
     bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_also_like_list))
     bt_alike_list.pack()
 
+    bt_alike_graph = tkinter.Button(text="Show also like graph", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_also_like_graph))
+    bt_alike_graph.pack()
+
     bt_exit = tkinter.Button(text="Quit", command=exit)
     bt_exit.pack()
 
