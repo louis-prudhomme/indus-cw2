@@ -21,7 +21,7 @@ def main(argv):
     elif task_id == '4':
         show_avid(df_global)
     elif task_id == '5d':
-        show_also_like()
+        show_also_like(df_global, doc_uuid, usr_uuid)
     elif task_id == '6':
         return
     elif task_id == '7':
@@ -32,7 +32,7 @@ def show_popup(title, msg):
 
 def check_input(argv):
     usr_uuid = doc_uuid = file_name = task_id = ''
-    valid_task_ids = ['2a', '2b', '3a', '4', '5d', '6', '7']
+    valid_task_ids = ['2a', '2b', '3a', '3b', '4', '5d', '6', '7']
     try:
         opts, args = getopt.getopt(argv,"hu:d:f:t:")
     except getopt.GetoptError:
@@ -113,9 +113,12 @@ def get_alike(df_global, doc_uuid, user_uuid=0, sort_func=lambda df: df):
     for usr in sr_readers:
         list_series.append(get_docs_read(df_global, usr))
 
-    sr_alike = pandas.concat(list_series)
-    sr_alike.dropna(inplace=True)
-    return sr_alike[sr_alike != doc_uuid].value_counts()
+    if len(list_series) < 1:
+        show_popup('Nothing found', 'No data was found for these criterias')
+    else:
+        sr_alike = pandas.concat(list_series)
+        sr_alike.dropna(inplace=True)
+        return sr_alike[sr_alike != doc_uuid].value_counts()
 
 def sort_df_asc(df_alike):
     return df_alike.sort_values(ascending=True)
@@ -162,7 +165,6 @@ def show_also_like(df_global, doc_uuid, user_uuid):
     label_alike = tkinter.Label(text=list_also_like)
     label_alike.pack()
     window_also_like.mainloop()
-
 
 def show_gui(doc_uuid, usr_uuid): 
     window = tkinter.Tk()
