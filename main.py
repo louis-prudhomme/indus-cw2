@@ -26,6 +26,8 @@ def main(argv):
     elif task_id == '7':
         return
 
+def show_popup(title, msg):
+    tkinter.messagebox.showinfo(title, msg)
 
 def check_input(argv):
     usr_uuid = doc_uuid = file_name = task_id = ''
@@ -125,18 +127,24 @@ def make_plot(df, title, label_x, label_y):
     pyplot.xlabel(label_x)
     pyplot.ylabel(label_y)
     pyplot.show()
-
-def show_continents(df_document):
-    make_plot(get_continents(df_document, df_continents), 'Number of visitors per continent', 'Continents', 'Visitors')
     
+def show_bar_plot(df, title, x, y):
+    if df.shape[0] > 0:
+        make_plot(df, title, x, y)
+    else:
+        show_popup('Nothing found', 'No data was found for these criterias')
+
 def show_countries(df_document):
-    make_plot(get_countries(df_document.copy()),'Number of visitors per country', 'Countries','Visitors')
+    show_bar_plot(get_countries(df_document),'Number of visitors per country', 'Countries','Visitors')
+
+def show_continents(df_document, df_continent):
+    show_bar_plot(get_continents(df_document, df_continent), 'Number of visitors per continent', 'Continents', 'Visitors')
 
 def show_browsers(df_global):
-    make_plot(get_browsers(df_global.copy()),'Number of visitors per browser', 'Browsers','Visitors')
+    show_bar_plot(get_browsers(df_global),'Number of visitors per browser', 'Browsers','Visitors')
 
 def show_avid(df_global):
-    make_plot(get_top10_readers(df_global.copy()), 'Most avid readers','Readers','Time read')
+    show_bar_plot(get_top10_readers(df_global), 'Most avid readers','Readers','Time read')
 
 def show_also_like(df_global, doc_uuid, user_uuid):
     list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
