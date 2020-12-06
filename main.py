@@ -59,23 +59,21 @@ def check_input(argv):
 
 def init_dfs(file_name, doc_uuid):
     try: 
-        set_file = open(file_name)
-        continent_file = open('./continent.json')
-    except OSError:
-        help(1, 'Cannot open files')
+        print('Obtaining dataset, please wait')
+        df_global = pandas.read_json(file_name, lines=True)
+        print('Obtaining continent file, please wait')
+        df_continent = pandas.read_json('http://country.io/continent.json', typ='series').rename_axis('country_code').reset_index(name='continent_code')
+    except OSError as err:
+        help(1, 'Cannot open files: {0}'.format(err))
+    except ValueError as err:
+        help(2, 'Please check the provided file: {0}'.format(err))
     else:
-        df_global = pandas.read_json(set_file, lines=True)
         df_document = df_global[df_global.subject_doc_id == doc_uuid]
-        df_continent = pandas.read_json(continent_file, typ='series').rename_axis('country_code').reset_index(name='continent_code')
-
-        set_file.close()
-        continent_file.close()
         return df_global, df_document, df_continent
 
-def help(err_code=0, err_msg='The correct usage is :'):
+def help(err_code=0, err_msg='The correct usage is : cw2 -u user_uuid -d doc_uuid -t task_id -f file_name'):
     print('CW2 Help')
     print(err_msg)
-    print('cw2 -u user_uuid -d doc_uuid -t task_id -f file_name')
     exit(err_code)
 
 def get_countries(df_document):
@@ -158,8 +156,9 @@ def show_avid(df_global):
     show_bar_plot(get_top10_readers(df_global), 'Most avid readers','Readers','Time read')
 
 def show_also_like_list(df_global, doc_uuid, user_uuid):
-    also_like_text = '\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
-    show_popup('Also like' + doc_uuid, also_like_text)
+    list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
+    also_like_text = 'Similar documents are :\n' + ',\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
+    show_popup('Also like ' + doc_uuid, also_like_text)
 
 def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid): 
     window = tkinter.Tk()
