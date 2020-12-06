@@ -266,37 +266,49 @@ def update_inputs(new_doc_uuid, new_usr_uuid, next_action):
 
 # creates and displays the app’s gui
 def show_gui(): 
+    # window init
     window = tkinter.Tk()
 
+    # button to display the country plot
     bt_countries = tkinter.Button(text="Visitors by countries", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_countries))
     bt_countries.pack()
 
+    # button to display the continent plot
     bt_continents = tkinter.Button(text="Visitors by continents", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_continents))
     bt_continents.pack()
 
+    # button to display the (clean) browser plot
+    # useragent plot is unreadable
     bt_browsers = tkinter.Button(text="Visitors by browsers", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_browsers_clean))
     bt_browsers.pack()
 
+    # button to display the most avid plot
     bt_avid = tkinter.Button(text="Most avid readers", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_avid))
     bt_avid.pack()
 
+    # text input for doc and usr uuid
     entry_doc = tkinter.Entry(window)
     entry_usr = tkinter.Entry(window)
 
+    # input and label
     tkinter.Label(window, text="Doc UUID").pack()
     entry_doc.insert(0, g_doc_uuid)
     entry_doc.pack()
     
+    # input and label
     tkinter.Label(window, text="User UUID").pack()
     entry_usr.insert(0, g_usr_uuid)
     entry_usr.pack()
 
+    # button to display the also like list
     bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_also_like_list))
     bt_alike_list.pack()
 
+    # button to display the also like graph
     bt_alike_graph = tkinter.Button(text="Show also like graph", command=lambda: update_inputs(entry_doc.get(), entry_usr.get(), show_also_like_graph))
     bt_alike_graph.pack()
 
+    # exit button
     bt_exit = tkinter.Button(text="Quit", command=exit)
     bt_exit.pack()
 
@@ -312,5 +324,6 @@ def help(err_code=0, err_msg='The correct usage is : cw2 -u user_uuid -d doc_uui
     print(err_msg)
     exit(err_code)
 
+# startup
 if __name__ == "__main__":
    main(sys.argv[1:])
