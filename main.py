@@ -158,19 +158,8 @@ def show_avid(df_global):
     show_bar_plot(get_top10_readers(df_global), 'Most avid readers','Readers','Time read')
 
 def show_also_like_list(df_global, doc_uuid, user_uuid):
-    list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
-    print(list_also_like)
-    exit()
-    window_also_like = tkinter.Tk()
-    label_doc = tkinter.Label(text="Also like the document " + doc_uuid)
-    label_doc.pack()
-    if len(list_also_like) > 0:
-        label_alike = tkinter.Label(text='\n'.join(list_also_like))
-    else:
-        label_alike = tkinter.Label(text='No similar doc were found')
-
-    label_alike.pack()
-    window_also_like.mainloop()
+    also_like_text = '\n'.join(list_also_like) if len(list_also_like) > 0 else 'No similar doc were found'
+    show_popup('Also like' + doc_uuid, also_like_text)
 
 def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid): 
     window = tkinter.Tk()
@@ -192,15 +181,15 @@ def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid):
     label_usr = tkinter.Label(text="User-chosen user UUID :" + usr_uuid)
     label_usr.pack()
 
-    entry_doc = tk.Entry(window)
-    entry_usr = tk.Entry(window)
+    entry_doc = tkinter.Entry(window)
+    entry_usr = tkinter.Entry(window)
 
-    tk.Label(window, text="Doc UUID").pack()
-    entry_doc.insert(doc_uuid)
+    tkinter.Label(window, text="Doc UUID").pack()
+    entry_doc.insert(0, doc_uuid)
     entry_doc.pack()
     
-    tk.Label(window, text="User UUID").pack()
-    entry_usr.insert(usr_uuid)
+    tkinter.Label(window, text="User UUID").pack()
+    entry_usr.insert(0, usr_uuid)
     entry_usr.pack()
 
     bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: show_also_like_list(df_global, entry_doc.get(), entry_usr.get()))
