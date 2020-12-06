@@ -33,7 +33,7 @@ def get_docs_read(df_global, visitor_uuid):
 
 def get_alike(df_global, doc_uuid, user_uuid=0, sort_func=lambda entry: entry):
     df_read = df_global[df_global.event_type == 'read']
-    sr_readers = get_readers_uuids(df_global, doc_uuid)
+    sr_readers = get_readers_uuids(df_read, doc_uuid)
     sr_readers = sr_readers[sr_readers != user_uuid]
 
     list_series = []
