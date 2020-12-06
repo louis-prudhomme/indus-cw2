@@ -127,7 +127,7 @@ def sort_df_desc(df_alike):
     return df_alike.sort_values(ascending=False)
 
 def also_like(df_global, doc_uuid, user_uuid=0, sort_func=lambda df: df):
-    return sort_func(get_alike(df_global, doc_uuid, user_uuid, sort_func).head(10))
+    return sort_func(get_alike(df_global, doc_uuid, user_uuid, sort_func).head(10)).index.tolist()
 
 def make_plot(df, title, label_x, label_y):
     df.plot(kind='bar', rot=0)
@@ -158,15 +158,16 @@ def show_avid(df_global):
     show_bar_plot(get_top10_readers(df_global), 'Most avid readers','Readers','Time read')
 
 def show_also_like(df_global, doc_uuid, user_uuid):
+    list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
+    print(list_also_like)
+    exit()
     window_also_like = tkinter.Tk()
     label_doc = tkinter.Label(text="Also like the document " + doc_uuid)
     label_doc.pack()
-
-    list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
     if len(list_also_like) > 0:
-        label_alike = tkinter.Label(text='No similar doc were found')
-    else:
         label_alike = tkinter.Label(text=list_also_like)
+    else:
+        label_alike = tkinter.Label(text='No similar doc were found')
 
     label_alike.pack()
     window_also_like.mainloop()
