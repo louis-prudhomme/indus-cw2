@@ -25,7 +25,7 @@ def main(argv):
     elif task_id == '6':
         return
     elif task_id == '7':
-        return
+        show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid)
 
 def show_popup(title, msg):
     tkinter.messagebox.showinfo(title, msg)
@@ -165,14 +165,14 @@ def show_also_like(df_global, doc_uuid, user_uuid):
     label_doc = tkinter.Label(text="Also like the document " + doc_uuid)
     label_doc.pack()
     if len(list_also_like) > 0:
-        label_alike = tkinter.Label(text=list_also_like)
+        label_alike = tkinter.Label(text='\n'.join(list_also_like))
     else:
         label_alike = tkinter.Label(text='No similar doc were found')
 
     label_alike.pack()
     window_also_like.mainloop()
 
-def show_gui(doc_uuid, usr_uuid): 
+def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid): 
     window = tkinter.Tk()
 
     label_doc = tkinter.Label(text="User-chosen document UUID :" + doc_uuid)
@@ -180,14 +180,17 @@ def show_gui(doc_uuid, usr_uuid):
     label_usr = tkinter.Label(text="User-chosen user UUID :" + usr_uuid)
     label_usr.pack()
 
-    bt_countries = tkinter.Button(text="Visitors by countries", command=show_countries)
+    bt_countries = tkinter.Button(text="Visitors by countries", command=show_countries(df_document))
     bt_countries.pack()
 
-    bt_continents = tkinter.Button(text="Visitors by continents", command=show_continents)
+    bt_continents = tkinter.Button(text="Visitors by continents", command=show_continents(df_document, df_continent))
     bt_continents.pack()
 
-    bt_browsers = tkinter.Button(text="Visitors by browsers", command=show_browsers)
+    bt_browsers = tkinter.Button(text="Visitors by browsers", command=show_browsers(df_global))
     bt_browsers.pack()
+
+    bt_avid = tkinter.Button(text="Most avid readers", command=show_avid(df_global))
+    bt_avid.pack()
 
     window.mainloop()
 
