@@ -8,11 +8,29 @@ import matplotlib.pyplot as pyplot
 import tkinter as tk
 
 def main(argv):
-    usr_uuid = ''
-    doc_uuid = ''
-    file_name = ''
-    task_id = ''
+    usr_uuid, doc_uuid, file_name, task_id = check_input(argv)
+    show_gui(doc_uuid, usr_uuid)
+    df_global, df_document, df_continent = init_dfs(file_name, doc_uuid)
 
+    if task_id = '2a':
+        show_countries()
+    elif task_id = '2b':
+        show_continents()
+    elif task_id = '3b':
+        show_browsers()
+    elif task_id = '4':
+        show_avid()
+    elif task_id = '5d':
+        show_also_like()
+    elif task_id = '6':
+
+    elif task_id = '7':
+        
+
+
+def check_input(argv):
+    usr_uuid = doc_uuid = file_name = task_id = ''
+    valid_task_ids = ['2a', '2b', '3a', '4', '5d', '6', '7']
     try:
         opts, args = getopt.getopt(argv,"hu:d:f:t:")
     except getopt.GetoptError:
@@ -32,16 +50,31 @@ def main(argv):
             help(2)
     if usr_uuid == '' or doc_uuid == '' or file_name == '' or task_id == '':
         help(2)
+    elif task_id not in valid_task_ids:
+        help(2, 'Provided task is invalid, valid tasks are ' + ' '.join(valid_task_ids))
     else:
-        df_global = pandas.read_json(open('./issuu_cw2.json'), lines=True)
-        df_continents = pandas.read_json(open('./continent.json'), typ='series').rename_axis('country_code').reset_index(name='continent_code')
+        return usr_uuid, doc_uuid, file_name, task_id
 
+def init_dfs(file_name, doc_uuid):
+    try: 
+        set_file = open(file_name)
+        continent_file = open('./continent.json')
+    except OSError:
+        help(1, 'Cannot open files')
+    else:
+        df_global = pandas.read_json(set_file, lines=True),
         df_document = df_global[df_global.subject_doc_id == doc_uuid]
-        show_gui(doc_uuid, usr_uuid)
+        df_continent = pandas.read_json(continent_file, typ='series').rename_axis('country_code').reset_index(name='continent_code')
 
-def help(err_code=0):
-    print('CW2 Help :')
+        set_file.close()
+        continent_file.close()
+    return df_global, df_document, df_continent
+
+def help(err_code=0, err_msg='The correct usage is :'):
+    print('CW2 Help')
+    print(err_msg)
     print('cw2 -u user_uuid -d doc_uuid -t task_id -f file_name')
+    exit(err_code)
 
 def get_countries(df_document):
     return df_document.visitor_country.value_counts().rename_axis('visitor_country').reset_index(name='number_visitors').set_index('visitor_country')
@@ -105,6 +138,16 @@ def show_browsers():
 
 def show_avid():
     make_plot(get_top10_readers(df_global.copy()), 'Most avid readers','Readers','Time read')
+
+def show_also_like():
+    list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
+    window = tk.Tk()
+    label_doc = tk.Label(text="Also like the document " + doc_uuid)
+    label_doc.pack()
+    label_alike = tk.Label(text=list_also_like)
+    label_alike.pack()
+    window.mainloop()
+
 
 def show_gui(doc_uuid, usr_uuid): 
     window = tk.Tk()
