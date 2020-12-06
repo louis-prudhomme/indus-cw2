@@ -17,6 +17,10 @@ g_df_global = g_df_document = g_df_continent = None
 # g_doc_uuid represents the currently select doc uuid
 g_usr_uuid = g_doc_uuid = ''
 
+# =========================================
+# CONTROLLER, ENTRY POINT, ARGUMENTS & INIT
+# =========================================
+
 # entry point of the program 
 def main(argv):
     global g_usr_uuid, g_doc_uuid 
@@ -89,6 +93,10 @@ def init_dfs(file_name):
         df_document = df_global[df_global.subject_doc_id == g_doc_uuid]
         return df_global, df_document, df_continent
 
+# =========================================
+# DATAFRAME MANIPULATION
+# =========================================
+
 # returns a dataframe with all the countries having read the document
 def get_countries():
     return g_df_document.visitor_country.value_counts().rename_axis('visitor_country').reset_index(name='number_visitors').set_index('visitor_country')
@@ -103,17 +111,17 @@ def get_browsers():
 
 # returns a dataframe with all the browser accessing the service, specifying the browser only (instead of user agent)
 def get_browsers_clean():
-    global g_df_global
+    sr_refined_useragent = g_df_global.visitor_useragent.str.extract(r'(\w+)/.*$')
+    df_cleaned_ua = g_df_global.assign(visitor_useragent=sr_refined_useragent)
     
-    refined_useragent = g_df_global.visitor_useragent.str.extract(r'(\w+)/.*$')
-    g_df_global = g_df_global.assign(visitor_useragent=refined_useragent)
-    
-    return g_df_global.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
+    return df_cleaned_ua.visitor_useragent.value_counts().rename_axis('visitor_browser').reset_index(name='number_visitors').set_index('visitor_browser')
 
 # returns a dataframe containing the top ten biggest readers by summing their pagereadtime
 def get_top10_readers():
     df_pageandread = g_df_global[g_df_global.event_type == 'pagereadtime'][['visitor_uuid', 'event_readtime']]
     return pandas.DataFrame(df_pageandread.groupby(['visitor_uuid']).sum().sort_values('event_readtime').head(10))
+
+# === ALSO LIKE === #
 
 # returns the uuid for every reader of the provided document
 def get_readers_uuids(df_read, document_uuid):
@@ -157,6 +165,10 @@ def sort_df_desc(df_alike):
 # returns the ten first similar documents, sorted with the provided function
 def also_like(sort_func=lambda df: df):
     return sort_func(get_alike(sort_func).head(10)).index.tolist()
+
+# =========================================
+# PLOTTING, SHOWING PLOTS, ALSO LIKE GRAPH
+# =========================================
 
 # makes a plot with the provided dataframe and legends
 def make_plot(df, title, label_x, label_y):
@@ -245,6 +257,10 @@ def show_also_like_graph():
 # returns a small uuid (last 4 chars)
 def get_small_uuid(uuid):
     return uuid[-4:]
+
+# =========================================
+# UI, GUI, POPUPS AND TERMINAL DISPLAY
+# =========================================
 
 # shows a popup displaying a list of documents similar to the reference 
 def show_also_like_list():
