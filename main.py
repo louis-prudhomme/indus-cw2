@@ -12,20 +12,20 @@ def main(argv):
     show_gui(doc_uuid, usr_uuid)
     df_global, df_document, df_continent = init_dfs(file_name, doc_uuid)
 
-    if task_id = '2a':
+    if task_id == '2a':
         show_countries()
-    elif task_id = '2b':
+    elif task_id == '2b':
         show_continents()
-    elif task_id = '3b':
+    elif task_id == '3b':
         show_browsers()
-    elif task_id = '4':
+    elif task_id == '4':
         show_avid()
-    elif task_id = '5d':
+    elif task_id == '5d':
         show_also_like()
-    elif task_id = '6':
-
-    elif task_id = '7':
-        
+    elif task_id == '6':
+        return
+    elif task_id == '7':
+        return
 
 
 def check_input(argv):
