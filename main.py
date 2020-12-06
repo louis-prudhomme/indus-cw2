@@ -21,7 +21,7 @@ def main(argv):
     elif task_id == '4':
         show_avid(df_global)
     elif task_id == '5d':
-        show_also_like(df_global, doc_uuid, usr_uuid)
+        show_also_like_list(df_global, doc_uuid, usr_uuid)
     elif task_id == '6':
         return
     elif task_id == '7':
@@ -157,7 +157,7 @@ def show_browsers_clean(df_global):
 def show_avid(df_global):
     show_bar_plot(get_top10_readers(df_global), 'Most avid readers','Readers','Time read')
 
-def show_also_like(df_global, doc_uuid, user_uuid):
+def show_also_like_list(df_global, doc_uuid, user_uuid):
     list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
     print(list_also_like)
     exit()
@@ -175,22 +175,39 @@ def show_also_like(df_global, doc_uuid, user_uuid):
 def show_gui(df_global, df_document, df_continent, doc_uuid, usr_uuid): 
     window = tkinter.Tk()
 
+    bt_countries = tkinter.Button(text="Visitors by countries", command=lambda: show_countries(df_document))
+    bt_countries.pack()
+
+    bt_continents = tkinter.Button(text="Visitors by continents", command=lambda: show_continents(df_document, df_continent))
+    bt_continents.pack()
+
+    bt_browsers = tkinter.Button(text="Visitors by browsers", command=lambda: show_browsers_clean(df_global))
+    bt_browsers.pack()
+
+    bt_avid = tkinter.Button(text="Most avid readers", command=lambda: show_avid(df_global))
+    bt_avid.pack()
+    
     label_doc = tkinter.Label(text="User-chosen document UUID :" + doc_uuid)
     label_doc.pack()
     label_usr = tkinter.Label(text="User-chosen user UUID :" + usr_uuid)
     label_usr.pack()
 
-    bt_countries = tkinter.Button(text="Visitors by countries", command=show_countries(df_document))
-    bt_countries.pack()
+    entry_doc = tk.Entry(window)
+    entry_usr = tk.Entry(window)
 
-    bt_continents = tkinter.Button(text="Visitors by continents", command=show_continents(df_document, df_continent))
-    bt_continents.pack()
+    tk.Label(window, text="Doc UUID").pack()
+    entry_doc.insert(doc_uuid)
+    entry_doc.pack()
+    
+    tk.Label(window, text="User UUID").pack()
+    entry_usr.insert(usr_uuid)
+    entry_usr.pack()
 
-    bt_browsers = tkinter.Button(text="Visitors by browsers", command=show_browsers(df_global))
-    bt_browsers.pack()
+    bt_alike_list = tkinter.Button(text="Show also like list", command=lambda: show_also_like_list(df_global, entry_doc.get(), entry_usr.get()))
+    bt_alike_list.pack()
 
-    bt_avid = tkinter.Button(text="Most avid readers", command=show_avid(df_global))
-    bt_avid.pack()
+    bt_exit = tkinter.Button(text="Quit", command=exit)
+    bt_exit.pack()
 
     window.mainloop()
 
