@@ -9,17 +9,16 @@ import tkinter as tk
 
 def main(argv):
     usr_uuid, doc_uuid, file_name, task_id = check_input(argv)
-    show_gui(doc_uuid, usr_uuid)
     df_global, df_document, df_continent = init_dfs(file_name, doc_uuid)
 
     if task_id == '2a':
-        show_countries()
+        show_countries(df_document)
     elif task_id == '2b':
-        show_continents()
+        show_continents(df_document)
     elif task_id == '3b':
-        show_browsers()
+        show_browsers(df_global)
     elif task_id == '4':
-        show_avid()
+        show_avid(df_global)
     elif task_id == '5d':
         show_also_like()
     elif task_id == '6':
@@ -62,13 +61,13 @@ def init_dfs(file_name, doc_uuid):
     except OSError:
         help(1, 'Cannot open files')
     else:
-        df_global = pandas.read_json(set_file, lines=True),
+        df_global = pandas.read_json(set_file, lines=True)
         df_document = df_global[df_global.subject_doc_id == doc_uuid]
         df_continent = pandas.read_json(continent_file, typ='series').rename_axis('country_code').reset_index(name='continent_code')
 
         set_file.close()
         continent_file.close()
-    return df_global, df_document, df_continent
+        return df_global, df_document, df_continent
 
 def help(err_code=0, err_msg='The correct usage is :'):
     print('CW2 Help')
@@ -127,26 +126,26 @@ def make_plot(df, title, label_x, label_y):
     pyplot.ylabel(label_y)
     pyplot.show()
 
-def show_continents():
+def show_continents(df_document):
     make_plot(get_continents(df_document, df_continents), 'Number of visitors per continent', 'Continents', 'Visitors')
     
-def show_countries():
+def show_countries(df_document):
     make_plot(get_countries(df_document.copy()),'Number of visitors per country', 'Countries','Visitors')
 
-def show_browsers():
+def show_browsers(df_global):
     make_plot(get_browsers(df_global.copy()),'Number of visitors per browser', 'Browsers','Visitors')
 
-def show_avid():
+def show_avid(df_global):
     make_plot(get_top10_readers(df_global.copy()), 'Most avid readers','Readers','Time read')
 
-def show_also_like():
+def show_also_like(df_global, doc_uuid, user_uuid):
     list_also_like = also_like(df_global, doc_uuid, user_uuid, sort_df_desc)
-    window = tk.Tk()
+    window_also_like = tk.Tk()
     label_doc = tk.Label(text="Also like the document " + doc_uuid)
     label_doc.pack()
     label_alike = tk.Label(text=list_also_like)
     label_alike.pack()
-    window.mainloop()
+    window_also_like.mainloop()
 
 
 def show_gui(doc_uuid, usr_uuid): 
